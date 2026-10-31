@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" preserveAspectRatio="none" fill="none">
+<g id="7b35e-Supabase_logo">
+<path id="7b35e-Vector" d="M18.1907 28.8903C17.5095 29.7482 16.1282 29.2781 16.1118 28.1827L15.8717 12.1608H26.6448C28.5961 12.1608 29.6844 14.4146 28.4711 15.9428L18.1907 28.8903Z" fill="url(#7b35e-paint0_linear_0_135)"/>
+<path id="7b35e-Vector_2" d="M18.1907 28.8903C17.5095 29.7482 16.1282 29.2781 16.1118 28.1827L15.8717 12.1608H26.6448C28.5961 12.1608 29.6844 14.4146 28.4711 15.9428L18.1907 28.8903Z" fill="url(#7b35e-paint1_linear_0_135)" fill-opacity="0.2"/>
+<path id="7b35e-Vector_3" d="M13.8093 3.10976C14.4905 2.25176 15.8718 2.72188 15.8882 3.81732L15.9934 19.8392H5.35516C3.40381 19.8392 2.3155 17.5854 3.52891 16.0572L13.8093 3.10976Z" fill="#3ECF8E"/>
+</g>
+<defs>
+<linearGradient id="7b35e-paint0_linear_0_135" x1="15.8717" y1="15.7133" x2="25.4465" y2="19.7289" gradientUnits="userSpaceOnUse">
+<stop stop-color="#249361"/>
+<stop offset="1" stop-color="#3ECF8E"/>
+</linearGradient>
+<linearGradient id="7b35e-paint1_linear_0_135" x1="11.6268" y1="9.90118" x2="15.9934" y2="18.121" gradientUnits="userSpaceOnUse">
+<stop/>
+<stop offset="1" stop-opacity="0"/>
+</linearGradient>
+</defs>
+</svg>

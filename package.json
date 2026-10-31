@@ -1,0 +1,14 @@
+{
+  "name": "poulo-portfolio-local",
+  "version": "1.0.0",
+  "description": "High-fidelity local replica of Pouya's (Poulo) Portfolio with all animations, UI/UX, videos, assets, interactive effects, and offline server.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "open": "node open-all.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.16.0"
+  }
+}
