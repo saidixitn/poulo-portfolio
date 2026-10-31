@@ -80,7 +80,9 @@ const server = http.createServer((req, res) => {
     return res.end();
   }
 
-  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  // Normalize HTML-escaped &amp; in URLs
+  const rawUrl = req.url.replace(/&amp;/g, '&');
+  const parsedUrl = new URL(rawUrl, `http://${req.headers.host || 'localhost'}`);
   let pathname = decodeURIComponent(parsedUrl.pathname);
 
   // Normalize trailing slash (except root)
@@ -90,25 +92,39 @@ const server = http.createServer((req, res) => {
 
   // 1. Handle Next.js Image Optimization
   if (pathname === '/_next/image') {
-    const imgUrl = parsedUrl.searchParams.get('url');
-    const w = parsedUrl.searchParams.get('w') || 'auto';
-    const q = parsedUrl.searchParams.get('q') || '75';
+    let imgUrl = parsedUrl.searchParams.get('url');
+    let w = parsedUrl.searchParams.get('w');
+    let q = parsedUrl.searchParams.get('q') || '75';
 
     if (imgUrl) {
+      // 1a. Check if exact cached version exists in _next/image_cache/
       const clean = imgUrl.replace(/^\//, '').replace(/[^a-zA-Z0-9._-]/g, '_');
-      const cachedFile = path.join(PUBLIC_DIR, '_next', 'image_cache', `${clean}_w${w}_q${q}.webp`);
-      if (fs.existsSync(cachedFile)) {
-        res.writeHead(200, { 'Content-Type': 'image/webp', 'Cache-Control': 'public, max-age=31536000' });
-        return fs.createReadStream(cachedFile).pipe(res);
+      if (w) {
+        const cachedFile = path.join(PUBLIC_DIR, '_next', 'image_cache', `${clean}_w${w}_q${q}.webp`);
+        if (fs.existsSync(cachedFile)) {
+          res.writeHead(200, { 'Content-Type': 'image/webp', 'Cache-Control': 'public, max-age=31536000' });
+          return fs.createReadStream(cachedFile).pipe(res);
+        }
       }
 
-      // Fallback to original unoptimized file in public/
+      // 1b. Check if original unoptimized file exists in public/
       const origFile = path.join(PUBLIC_DIR, imgUrl.startsWith('/') ? imgUrl.slice(1) : imgUrl);
       if (fs.existsSync(origFile) && fs.statSync(origFile).isFile()) {
         const ext = path.extname(origFile).toLowerCase();
         const mime = MIME_TYPES[ext] || 'image/jpeg';
         res.writeHead(200, { 'Content-Type': mime, 'Cache-Control': 'public, max-age=31536000' });
         return fs.createReadStream(origFile).pipe(res);
+      }
+
+      // 1c. Fallback to ANY cached resolution for this image in image_cache
+      const cacheDir = path.join(PUBLIC_DIR, '_next', 'image_cache');
+      if (fs.existsSync(cacheDir)) {
+        const cachedFiles = fs.readdirSync(cacheDir);
+        const match = cachedFiles.find(f => f.startsWith(`${clean}_w`));
+        if (match) {
+          res.writeHead(200, { 'Content-Type': 'image/webp', 'Cache-Control': 'public, max-age=31536000' });
+          return fs.createReadStream(path.join(cacheDir, match)).pipe(res);
+        }
       }
     }
     res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -134,9 +150,8 @@ const server = http.createServer((req, res) => {
         'Cache-Control': 'no-cache'
       });
 
-      const responseText = `Hi! You asked: "${question}". I am Pouya's portfolio assistant running locally with full interactivity! Pouya is a technical product designer and front-end engineer specializing in AI agentics (Billdr, Chloe, Otera), modern SaaS platforms (QPage, Weldica), and brand websites (Nexscale). Explore all the case studies and experiments right here!`;
+      const responseText = `Hi! You asked: "${question}". I am Pouya's portfolio assistant running locally! Pouya is a technical product designer and front-end engineer specializing in AI agentics (Billdr, Chloe, Otera), modern SaaS platforms (QPage, Weldica), and brand websites (Nexscale). Explore all the case studies and experiments right here!`;
 
-      // Stream words
       const words = responseText.split(' ');
       let idx = 0;
       const interval = setInterval(() => {
@@ -211,7 +226,7 @@ const server = http.createServer((req, res) => {
 
   // 404 fallback
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-  res.end('Not Found');
+  res.end('Not Found: ' + pathname);
 });
 
 server.listen(PORT, () => {
