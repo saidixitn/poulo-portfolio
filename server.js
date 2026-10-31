@@ -109,7 +109,7 @@ const server = http.createServer((req, res) => {
 
       // 1b. Check if original unoptimized file exists in public/
       const origFile = path.join(PUBLIC_DIR, imgUrl.startsWith('/') ? imgUrl.slice(1) : imgUrl);
-      if (fs.existsSync(origFile) && fs.statSync(origFile).isFile()) {
+      if (fs.existsSync(origFile) && fs.statSync(origFile).isFile() && fs.statSync(origFile).size > 0) {
         const ext = path.extname(origFile).toLowerCase();
         const mime = MIME_TYPES[ext] || 'image/jpeg';
         res.writeHead(200, { 'Content-Type': mime, 'Cache-Control': 'public, max-age=31536000' });
